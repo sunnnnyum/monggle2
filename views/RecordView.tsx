@@ -48,11 +48,11 @@ const RecordView: React.FC<RecordViewProps> = ({ records, onAddRecord }) => {
       date: selectedDate,
       score: 75 + Math.floor(Math.random() * 20),
       duration: 420 + Math.floor(Math.random() * 60),
-      deepSleep: 20,
-      lightSleep: 60,
-      remSleep: 20,
+      deepSleep: 20 + Math.floor(Math.random() * 10),
+      lightSleep: 50 + Math.floor(Math.random() * 10),
+      remSleep: 20 + Math.floor(Math.random() * 5),
       mood,
-      satisfaction: 4,
+      satisfaction: 3 + Math.floor(Math.random() * 3),
       title,
       memo,
       tags: ['기록됨']
@@ -88,8 +88,8 @@ const RecordView: React.FC<RecordViewProps> = ({ records, onAddRecord }) => {
                 <div className="flex justify-between items-center mb-6 px-2">
                   <span className="font-bold text-dark">{year}년 {month}월</span>
                   <div className="flex gap-4">
-                    <i className="fa-solid fa-chevron-left text-gray-300 text-xs"></i>
-                    <i className="fa-solid fa-chevron-right text-dark text-xs"></i>
+                    <i className="fa-solid fa-chevron-left text-gray-300 text-xs cursor-pointer"></i>
+                    <i className="fa-solid fa-chevron-right text-dark text-xs cursor-pointer"></i>
                   </div>
                 </div>
                 <div className="grid grid-cols-7 gap-y-1 text-center">
@@ -114,29 +114,77 @@ const RecordView: React.FC<RecordViewProps> = ({ records, onAddRecord }) => {
               <div className="space-y-4">
                 <h3 className="font-bold text-dark px-2">선택한 날의 기록</h3>
                 {todayRecord ? (
-                  <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm animate-in slide-in-from-bottom-2">
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">{todayRecord.mood.split(' ')[0]}</span>
+                  <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm animate-in slide-in-from-bottom-2 space-y-5">
+                    {/* 상단: 기분 및 기본 정보 */}
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-14 bg-softGray rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                          {todayRecord.mood.split(' ')[0]}
+                        </div>
                         <div>
-                          <p className="font-bold text-dark leading-none">{todayRecord.mood.split(' ')[1]}</p>
-                          <p className="text-[10px] text-gray-400 mt-1">{todayRecord.date}</p>
+                          <p className="font-black text-dark text-lg">{todayRecord.mood.split(' ')[1]}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-gray-400 font-bold">{todayRecord.date}</span>
+                            <div className="w-1 h-1 bg-gray-200 rounded-full"></div>
+                            <span className="text-[10px] text-secondary font-black">
+                              {Math.floor(todayRecord.duration / 60)}h {todayRecord.duration % 60}m 수면
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleEdit(todayRecord)} className="text-gray-300 hover:text-secondary p-2"><i className="fa-solid fa-pen-to-square"></i></button>
-                        <div className="bg-primary/20 text-dark px-3 py-1 rounded-full font-bold text-xs">{todayRecord.score}점</div>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex gap-1">
+                          <button onClick={() => handleEdit(todayRecord)} className="text-gray-300 hover:text-secondary p-2 transition-colors"><i className="fa-solid fa-pen-to-square"></i></button>
+                        </div>
+                        <div className="bg-primary text-dark px-3 py-1 rounded-full font-black text-xs shadow-sm">{todayRecord.score}점</div>
                       </div>
                     </div>
-                    <h4 className="font-bold text-dark mb-2">{todayRecord.title}</h4>
-                    <p className="text-sm text-gray-500 leading-relaxed mb-4">{todayRecord.memo}</p>
-                    <div className="flex gap-2">
-                      {todayRecord.tags.map(t => <span key={t} className="text-[10px] bg-softGray px-2 py-1 rounded-lg text-gray-500">#{t}</span>)}
+
+                    {/* 수면 메트릭 상세 */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-softGray p-4 rounded-2xl">
+                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-2">만족도</p>
+                        <div className="flex gap-0.5 text-secondary text-[10px]">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <i key={i} className={`fa-solid fa-star ${i < todayRecord.satisfaction ? 'opacity-100' : 'opacity-20 text-gray-400'}`}></i>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="bg-softGray p-4 rounded-2xl">
+                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 text-right">깊은 수면</p>
+                        <p className="text-sm font-black text-dark text-right">{todayRecord.deepSleep}%</p>
+                      </div>
+                    </div>
+
+                    {/* 수면 단계 시각화 바 */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-end mb-1 px-1">
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">Sleep Stages</p>
+                      </div>
+                      <div className="w-full h-3 bg-gray-100 rounded-full flex overflow-hidden">
+                        <div style={{ width: `${todayRecord.deepSleep}%` }} className="h-full bg-secondary" title="Deep Sleep"></div>
+                        <div style={{ width: `${todayRecord.lightSleep}%` }} className="h-full bg-primary" title="Light Sleep"></div>
+                        <div style={{ width: `${todayRecord.remSleep}%` }} className="h-full bg-purple-300" title="REM Sleep"></div>
+                      </div>
+                      <div className="flex justify-between text-[9px] font-bold px-1">
+                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-secondary"></div><span className="text-gray-500">깊은잠 {todayRecord.deepSleep}%</span></div>
+                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-primary"></div><span className="text-gray-500">얕은잠 {todayRecord.lightSleep}%</span></div>
+                        <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-purple-300"></div><span className="text-gray-500">REM {todayRecord.remSleep}%</span></div>
+                      </div>
+                    </div>
+
+                    {/* 제목 및 메모 */}
+                    <div className="pt-2 border-t border-gray-50">
+                      <h4 className="font-bold text-dark mb-2 text-sm">"{todayRecord.title}"</h4>
+                      <p className="text-xs text-gray-500 leading-relaxed mb-4">{todayRecord.memo}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {todayRecord.tags.map(t => <span key={t} className="text-[9px] bg-secondary/5 px-2.5 py-1 rounded-lg text-secondary font-bold">#{t}</span>)}
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white/50 border-2 border-dashed border-gray-100 p-10 rounded-[2rem] text-center">
-                    <p className="text-gray-400 text-sm mb-4">이 날은 수면 기록이 없음</p>
+                  <div className="bg-white/50 border-2 border-dashed border-gray-100 p-10 rounded-[2.5rem] text-center">
+                    <p className="text-gray-400 text-sm mb-4">이 날은 수면 기록이 없어요</p>
                     <button onClick={() => { setEditingId(null); setTitle(''); setMemo(''); setView('form'); }} className="text-primary font-bold text-xs underline underline-offset-4">기록 추가하기</button>
                   </div>
                 )}
@@ -150,18 +198,18 @@ const RecordView: React.FC<RecordViewProps> = ({ records, onAddRecord }) => {
               </div>
               <div className="space-y-4">
                 {records.map(record => (
-                  <div key={record.id} onClick={() => { setSelectedDate(record.date); setSubTab('calendar'); }} className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm active:scale-[0.98] transition-all cursor-pointer">
+                  <div key={record.id} onClick={() => { setSelectedDate(record.date); setSubTab('calendar'); }} className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm active:scale-[0.98] transition-all cursor-pointer group">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{record.mood.split(' ')[0]}</span>
+                        <span className="text-xl group-hover:scale-110 transition-transform">{record.mood.split(' ')[0]}</span>
                         <span className="text-[10px] font-bold text-dark bg-primary/20 px-2 py-0.5 rounded-lg">{record.date}</span>
                       </div>
                       <span className="text-xs font-black text-dark">{record.score}점</span>
                     </div>
                     <h4 className="font-bold text-dark text-sm mb-1">{record.title}</h4>
-                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{record.memo}</p>
+                    <p className="text-xs text-gray-500 line-clamp-1 leading-relaxed">{record.memo}</p>
                     <div className="mt-4 pt-3 border-t border-gray-50 flex justify-between items-center">
-                      <div className="flex gap-1">
+                      <div className="flex gap-2">
                         {record.tags.map(t => <span key={t} className="text-[9px] text-gray-400">#{t}</span>)}
                       </div>
                       <span className="text-[9px] text-gray-300 font-bold">{Math.floor(record.duration / 60)}h {record.duration % 60}m</span>
@@ -176,13 +224,13 @@ const RecordView: React.FC<RecordViewProps> = ({ records, onAddRecord }) => {
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 space-y-6 shadow-xl animate-in slide-in-from-bottom-5">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-dark">{editingId ? '기록 수정' : '기록 남기기'}</h2>
-            <button type="button" onClick={() => setView('record')} className="text-gray-300"><i className="fa-solid fa-xmark text-xl"></i></button>
+            <button type="button" onClick={() => setView('record')} className="text-gray-300 hover:text-dark transition-colors"><i className="fa-solid fa-xmark text-xl"></i></button>
           </div>
 
           <div className="space-y-5">
             <div>
               <label className="block text-xs font-bold text-gray-400 mb-2 ml-2 uppercase tracking-widest">날짜</label>
-              <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-full bg-softGray p-4 rounded-2xl outline-none font-medium" />
+              <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-full bg-softGray p-4 rounded-2xl outline-none font-medium border border-transparent focus:border-primary transition-all" />
             </div>
 
             <div>
