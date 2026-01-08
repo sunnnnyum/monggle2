@@ -11,12 +11,13 @@ interface HomeViewProps {
 const HomeView: React.FC<HomeViewProps> = ({ onNavigateRecord, latestRecord }) => {
   const score = latestRecord?.score || 0;
 
-  // 데이터 편차를 키워 더 역동적인 모양(덜 완만한 모양)을 생성
+  // 데이터 편차를 고의적으로 키워 더 역동적인 모양(덜 완만한 모양)을 생성
+  // 불균형한 수면 지표를 시각적으로 더 뚜렷하게 보여줌
   const radarData = [
-    { subject: '수면 깊이', A: 55, fullMark: 100 },
+    { subject: '수면 깊이', A: 45, fullMark: 100 },
     { subject: '규칙성', A: 95, fullMark: 100 },
     { subject: '총 시간', A: score, fullMark: 100 },
-    { subject: '효율', A: 65, fullMark: 100 },
+    { subject: '효율', A: 55, fullMark: 100 },
     { subject: '만족도', A: 85, fullMark: 100 },
   ];
   
@@ -68,14 +69,17 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigateRecord, latestRecord }) =
                 stroke="#FFC62C"
                 strokeWidth={4}
                 fill="#FFC62C"
-                fillOpacity={0.3}
+                fillOpacity={0.4}
               />
             </RadarChart>
           </ResponsiveContainer>
         </div>
-        <p className="mt-4 text-[11px] font-medium text-gray-400 text-center leading-relaxed">
-           규칙성이 매우 우수함. <br/> <span className="text-secondary font-bold">수면 효율</span>과 <span className="text-secondary font-bold">깊은 잠</span> 비중만 조금 더 높여보기!
-        </p>
+        <div className="mt-4 text-center">
+          <p className="text-[11px] font-medium text-gray-400 leading-relaxed">
+             규칙성은 매우 우수하지만,<br/> 
+             <span className="text-secondary font-bold">깊은 잠</span>과 <span className="text-secondary font-bold">수면 효율</span>이 상대적으로 낮아요.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">

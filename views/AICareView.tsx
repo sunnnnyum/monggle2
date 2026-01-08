@@ -35,20 +35,26 @@ const AICareView: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = input;
     setInput('');
     setLoading(true);
 
-    const interpretation = await getAIInterpretation(input);
-    
-    const botMsg: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      role: 'model',
-      text: interpretation,
-      timestamp: new Date()
-    };
+    try {
+      const interpretation = await getAIInterpretation(currentInput);
+      
+      const botMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: interpretation,
+        timestamp: new Date()
+      };
 
-    setMessages(prev => [...prev, botMsg]);
-    setLoading(false);
+      setMessages(prev => [...prev, botMsg]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
